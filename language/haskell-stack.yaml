@@ -4,17 +4,20 @@ pre-commit:
   piped: false
   follow: false
   commands:
-    lint:
+    hs-lint:
       run: hlint .
       glob: "**/*.hs"
       tags: haskell
-    build:
+      priority: 20
+    hs-build:
       run: stack build
       glob: "**/*.hs"
       tags: haskell
+      priority: 50
 pre-push:
   commands:
-    test:
+    hs-test:
       run: stack test
       glob: "**/*.hs"
       tags: haskell
+      priority: 90
