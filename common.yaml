@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+commit-msg:
+  commands:
+    sign:
+      run: git interpret-trailers --in-place --trailer "sign" --trim-empty "{1}"
+pre-commit:
+  piped: true
+  commands:
+    typos:
+      run: typos --force-exclude {staged_files}
+      file_types: text
+      priority: 20
+    editorconfig:
+      run: editorconfig-checker {staged_files}
+      file_types: text
+      priority: 20
+    checkmake:
+      only:
+      - run: test -f Makefile
+      run: checkmake {staged_files}
+      glob: Makefile
+      priority: 20

@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+assert_lefthook_installed: true
+extends:
+- common.yaml
+- conventional-commits.yaml

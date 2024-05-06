@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+commit-msg:
+  commands:
+    commitlint:
+      run: commitlint lint --message "{1}"

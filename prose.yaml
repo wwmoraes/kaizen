@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+pre-commit:
+  commands:
+    vale-sync:
+      only:
+      - run: test -f .vale.ini
+      run: vale sync
+      glob: .vale.ini
+      priority: 10
+    vale:
+      only:
+      - run: test -d .styles
+      run: vale {staged_files}
+      exclude: (\.styles)/.*
+      file_types: text
+      priority: 20
