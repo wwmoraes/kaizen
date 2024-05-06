@@ -12,7 +12,21 @@ pre-commit:
       glob: "**/*.go"
       stage_fixed: true
       tags: golang
+      priority: 20
     go-lint:
       run: golangci-lint run
       glob: "**/*.go"
       tags: golang
+      priority: 20
+    go-build:
+      run: go build ./...
+      glob: "**/*.go"
+      tags: golang
+      priority: 50
+pre-push:
+  commands:
+    go-test:
+      run: go test ./...
+      glob: "**/*.go"
+      tags: golang
+      priority: 90
