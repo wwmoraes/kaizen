@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+pre-commit:
+  commands:
+    sass-lint:
+      run: stylelint -f compact {staged_files}
+      glob: "**/*.{sass,scss}"
+      tags: sass
+      priority: 20
