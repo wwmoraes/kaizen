@@ -17,7 +17,7 @@ pre-commit:
       run: golangci-lint run
       glob: "**/*.go"
       tags: golang
-      priority: 20
+      priority: 30
     go-build:
       run: go build ./...
       glob: "**/*.go"
