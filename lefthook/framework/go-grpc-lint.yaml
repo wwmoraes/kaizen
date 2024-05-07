@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+pre-commit:
+  commands:
+    grpc-lint:
+      run: protolint lint {staged_files}
+      glob: "**/*.proto"
+      tags: grpc
+      priority: 30

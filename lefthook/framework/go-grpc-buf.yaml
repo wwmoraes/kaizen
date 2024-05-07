@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+pre-commit:
+  commands:
+    go-grpc-generate:
+      run: buf generate
+      glob: "{**/*.proto,buf.yaml,buf.gen.yaml}"
+      stage_fixed: true
+      tags: golang,grpc
+      priority: 20
+      skip: true
