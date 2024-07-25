@@ -1,0 +1,249 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CommitType": {
+      "description": "Commit type details",
+      "properties": {
+        "changelog_title": {
+          "description": "Change the changelog title for the given commit type.",
+          "type": "string"
+        },
+        "omit_from_changelog": {
+          "default": false,
+          "description": "Do not generate changelog entries for the given commit type.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "changelog_title"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "branch_whitelist": {
+      "description": "A list of glob patterns to allow bumping only on matching branches.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "bump_profiles": {
+      "description": "Add additional pre-bump and post-bump hooks profile. a profile can be used with the `cog bump --hook-profile <profile_name>` flag.",
+      "patternProperties": {
+        "^_S$": {
+          "properties": {
+            "post_bump_hooks": {
+              "description": "An array of commands to execute after a version bump.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "post_package_bump_hooks": {
+              "description": "An array of commands executed after every package bump.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "pre_bump_hooks": {
+              "description": "An array of commands to execute before a version bump.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "pre_package_bump_hooks": {
+              "description": "An array of commands executed before every package bump.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "changelog": {
+      "properties": {
+        "authors": {
+          "description": "A list of commit authors with their git signature and git platform username to generate Markdown links in changelogs.",
+          "items": {
+            "properties": {
+              "signature": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "signature",
+              "username"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "owner": {
+          "description": "owner of the repository on the remote git platform.",
+          "type": "string"
+        },
+        "path": {
+          "default": "CHANGELOG.md",
+          "description": "Path the repository markdown changelog.",
+          "type": "string"
+        },
+        "remote": {
+          "description": "Domain name of the git platform hosting the repository, used for Markdown link generation in changelogs. when provided `repository` and `owner` are also required.",
+          "type": "string"
+        },
+        "repository": {
+          "description": "Name of the repository on the remote git platform.",
+          "type": "string"
+        },
+        "template": {
+          "default": "default",
+          "description": "Name of the builtin template to use for changelog generation or path to a custom template. Note that `remote`, `repository` and `owner` are mandatory if the \"remote\" built-in template is used or if your custom template make use of those variables.",
+          "oneOf": [
+            {
+              "enum": [
+                "default",
+                "full_hash",
+                "remote"
+              ]
+            },
+            {
+              "pattern": "^(?!default|full_hash|remote).+$"
+            }
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "authors",
+        "path"
+      ],
+      "type": "object"
+    },
+    "commit_types": {
+      "additionalProperties": {
+        "$ref": "#/definitions/CommitType"
+      },
+      "description": "Extend the allowed commit types, creating a new `cog commit` command and allowing to generate changelog entries for the given type. Can also be used to override the default commit types.",
+      "type": "object"
+    },
+    "disable_bump_commit": {
+      "default": false,
+      "description": "Cocogitto will not create a bump commit and will instead tag the latest commit.",
+      "type": "boolean"
+    },
+    "disable_changelog": {
+      "default": false,
+      "description": "Disable changelog generation when bumping.",
+      "type": "boolean"
+    },
+    "git-hooks": {
+      "properties": {
+        "commit_msg": {
+          "properties": {
+            "script": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "pre-push": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "ignore_merge_commits": {
+      "default": false,
+      "description": "Whether to ignore or to lint merge commits.",
+      "type": "boolean"
+    },
+    "monorepo_version_separator": {
+      "default": "-",
+      "description": "set a package tag separator. For instance if you have a `-` as package separator, cocogitto will generate monorepo package version starting with the package name followed by the optional prefix and package version (ex: `my-package-v1.0.0`)",
+      "type": "string"
+    },
+    "packages": {
+      "description": "Mono-repository packages",
+      "patternProperties": {
+        "^S_$": {
+          "properties": {
+            "changelog_path": {
+              "description": "Overrides the default changelog path, allowing to set an absolute path.",
+              "type": "string"
+            },
+            "path": {
+              "description": "Set the package path.",
+              "type": "string"
+            },
+            "public_api": {
+              "default": true,
+              "description": "If set to false package will not trigger global version bump.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "post_bump_hooks": {
+      "description": "An array of commands to execute after a version bump.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "post_package_bump_hooks": {
+      "description": "An array of commands executed after every package bump.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "pre_bump_hooks": {
+      "description": "An array of commands to execute before a version bump.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "pre_package_bump_hooks": {
+      "description": "An array of commands executed before every package bump.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "skip_ci": {
+      "description": "A \"skip-ci\" string to add to the commits when using the `bump` or `commit` commands. Default value is `[skip ci]`.",
+      "type": "string"
+    },
+    "skip_untracked": {
+      "description": "Allows to perform bump even if there are untracked or uncommited changes.",
+      "type": "boolean"
+    },
+    "tag_prefix": {
+      "description": "Set a tag prefix value for cocogitto. For instance if you have a v as a tag prefix, cocogitto will generate version starting with v and commands like cog changelog will pick only those versions.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
