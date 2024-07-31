@@ -1,0 +1,11 @@
+{
+  system ? builtins.currentSystem,
+  pkgs ? import <nixpkgs> { inherit system; }
+}: let
+  callPackage = pkgs.lib.callPackageWith (pkgs // self);
+  self = {
+    go-commitlint = callPackage ./nixpkgs/go-commitlint.nix { };
+    structurizr-cli = callPackage ./nixpkgs/structurizr-cli.nix { };
+    structurizr-site-generatr = callPackage ./nixpkgs/structurizr-site-generatr.nix { };
+  };
+in self
