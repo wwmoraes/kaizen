@@ -4,6 +4,7 @@
 }: let
   callPackage = pkgs.lib.callPackageWith (pkgs // self);
   self = {
+    ejson = callPackage ./nixpkgs/ejson.nix { };
     go-commitlint = callPackage ./nixpkgs/go-commitlint.nix { };
     structurizr-cli = callPackage ./nixpkgs/structurizr-cli.nix { };
     structurizr-site-generatr = callPackage ./nixpkgs/structurizr-site-generatr.nix { };
