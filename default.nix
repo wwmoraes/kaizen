@@ -6,6 +6,7 @@
   self = {
     ejson = callPackage ./nixpkgs/ejson.nix { };
     go-commitlint = callPackage ./nixpkgs/go-commitlint.nix { };
+    gopium = callPackage ./nixpkgs/gopium.nix { };
     structurizr-cli = callPackage ./nixpkgs/structurizr-cli.nix { };
     structurizr-site-generatr = callPackage ./nixpkgs/structurizr-site-generatr.nix { };
   };
