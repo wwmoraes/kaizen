@@ -1,10 +1,6 @@
-{
-  fetchzip,
-  jre,
-  lib,
-  makeBinaryWrapper,
-  stdenvNoCC
-}: stdenvNoCC.mkDerivation rec {
+{ fetchzip, jre, lib, makeBinaryWrapper, stdenvNoCC }:
+
+stdenvNoCC.mkDerivation rec {
   pname = "structurizr-cli";
   version = "2024.07.03";
 

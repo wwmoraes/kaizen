@@ -1,11 +1,6 @@
-{
-  fetchzip,
-  graphviz,
-  jre,
-  lib,
-  makeBinaryWrapper,
-  stdenvNoCC
-}: stdenvNoCC.mkDerivation rec {
+{ fetchzip, graphviz, jre, lib, makeBinaryWrapper, stdenvNoCC }:
+
+stdenvNoCC.mkDerivation rec {
   pname = "structurizr-site-generatr";
   version = "1.3.0";
 
