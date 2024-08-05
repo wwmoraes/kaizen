@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+tasks:
+  nix:build:*:
+    desc: Test building a specific nix package.
+    label: nix:build:{{ .NAME }}
+    vars:
+      NAME: '{{ index .MATCH 0 }}'
+    cmd: nix-build default.nix -A {{ .NAME }} --no-out-link
