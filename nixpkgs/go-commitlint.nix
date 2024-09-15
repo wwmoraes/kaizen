@@ -7,7 +7,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "conventionalcommit";
     repo = "commitlint";
-    rev = "v${version}";
+    rev = "refs/tags/v${version}";
     hash = "sha256-CnwYsF35zr5Gzcgzhky8lkdV9dDTTL85IAE6zDoI19w=";
     leaveDotGit = true;
     postFetch = ''
