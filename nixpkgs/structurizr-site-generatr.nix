@@ -1,4 +1,4 @@
-{ fetchzip, graphviz, jre, lib, makeBinaryWrapper, stdenvNoCC }:
+{ fetchzip, graphviz, jre, lib, stdenvNoCC, writeShellScriptBin }:
 
 stdenvNoCC.mkDerivation rec {
   pname = "structurizr-site-generatr";
@@ -9,19 +9,25 @@ stdenvNoCC.mkDerivation rec {
     hash = "sha256-53/PiVi9XLPlUMlTCoHqA8XF+rdbEUwAne+T1BVJKDQ=";
   };
 
-  nativeBuildInputs = [
-    makeBinaryWrapper
-  ];
+  wrapped = writeShellScriptBin "structurizr-site-generatr" ''
+    export PATH=${lib.makeBinPath [ graphviz ]}:$PATH
+
+    exec ${jre}/bin/java \
+      $STRUCTURIZR_SITE_GENERATR_OPTS \
+      -classpath "$out/share/structurizr-site-generatr/*" \
+      nl.avisi.structurizr.site.generatr.AppKt \
+      "$@"
+  '';
 
   buildCommand = ''
     mkdir -p $out/share/structurizr-site-generatr
     install -Dm644 $src/lib/* $out/share/structurizr-site-generatr
 
     mkdir -p $out/bin
-    makeWrapper ${jre}/bin/java $out/bin/structurizr-site-generatr \
-      --argv0 structurizr-site-generatr \
-      --prefix PATH : ${lib.makeBinPath [ graphviz ]} \
-      --add-flags "-classpath $out/share/structurizr-site-generatr/* nl.avisi.structurizr.site.generatr.AppKt"
+    cp ${wrapped}/bin/structurizr-site-generatr $out/bin/structurizr-site-generatr
+
+    substituteInPlace $out/bin/structurizr-site-generatr \
+      --replace-fail '$out' "$out"
   '';
 
   doInstallCheck = true;
