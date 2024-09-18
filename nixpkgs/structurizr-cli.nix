@@ -1,4 +1,4 @@
-{ fetchzip, jre, lib, makeBinaryWrapper, stdenvNoCC }:
+{ fetchzip, jre, lib, stdenvNoCC, writeShellScriptBin }:
 
 stdenvNoCC.mkDerivation rec {
   pname = "structurizr-cli";
@@ -10,18 +10,23 @@ stdenvNoCC.mkDerivation rec {
     stripRoot = false;
   };
 
-  nativeBuildInputs = [
-    makeBinaryWrapper
-  ];
+  wrapped = writeShellScriptBin "structurizr-cli" ''
+    exec ${jre}/bin/java \
+      $VMARGS \
+      -classpath "$out/share/structurizr-cli/*" \
+      com.structurizr.cli.StructurizrCliApplication \
+      "$@"
+  '';
 
   buildCommand = ''
     mkdir -p $out/share/structurizr-cli
     install -Dm644 $src/lib/* $out/share/structurizr-cli
 
     mkdir -p $out/bin
-    makeWrapper ${jre}/bin/java $out/bin/structurizr-cli \
-      --argv0 structurizr-cli \
-      --add-flags "-cp $out/share/structurizr-cli/* com.structurizr.cli.StructurizrCliApplication"
+    cp ${wrapped}/bin/structurizr-cli $out/bin/structurizr-cli
+
+    substituteInPlace $out/bin/structurizr-cli \
+      --replace-fail '$out' "$out"
   '';
 
   doInstallCheck = true;
