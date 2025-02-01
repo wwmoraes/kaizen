@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+tasks:
+  ## TODO refactor build task
+  build:
+    desc: Builds a container image.
+    requires:
+      vars:
+      - NAME
+      - TAGS
+    preconditions:
+    - sh: command -v docker &> /dev/null
+      msg: Binary 'docker' not found.
+    - sh: command -v xargs &> /dev/null
+      msg: Binary 'xargs' not found.
+    - sh: command -v rg &> /dev/null
+      msg: Binary 'rg' not found.
+    - sh: test -f {{ .DOCKERFILE | q }}
+      msg: File {{ .DOCKERFILE | squote }} not found.
+    - sh: test -d {{ .CONTEXT | q }}
+      msg: Context directory {{ .CONTEXT | squote }} not found.
+    - sh: >-
+        docker builder inspect --debug
+        | xargs
+        | rg --fixed-strings -- "Multi-platform build: true" > /dev/null
+      msg: Please create and enable a docker builder that supports multi-platform builds.
+    env:
+      DOCKER_BUILDKIT: 1
+      ## avoids mixing application debugging with buildkit
+      GRPC_GO_LOG_VERBOSITY_LEVEL: null
+      GRPC_GO_LOG_SEVERITY_LEVEL: null
+      ## https://github.com/moby/moby/issues/46129
+      OTEL_EXPORTER_OTLP_ENDPOINT: null
+    vars:
+      CREATED: '{{ dateInZone "2006-01-02T03:04:05Z" (now) "UTC" }}'
+      DOCKERFILE: '{{ .DOCKERFILE | default "Dockerfile" }}'
+      CONTEXT: '{{ .CONTEXT | default "." }}'
+      LABELS: >-
+        org.opencontainers.image.created={{ .CREATED | q }}
+        {{ .LABELS }}
+    cmd: >-
+      docker buildx build
+      {{ with .PLATFORMS -}}
+      {{ with (. | trim) -}}
+      --platform {{ . | splitList " " | compact | join "," }}
+      {{ end -}}
+      {{ end -}}
+      --file {{ .DOCKERFILE | q }}
+      {{ with .BUILD_ARGS -}}
+      {{ range $value := (. | trim | splitList " " | compact) -}}
+      --build-arg {{ $value }}
+      {{ end -}}
+      {{ end -}}
+      {{ range $value := (.LABELS | trim | splitList " " | compact) -}}
+      --label {{ $value }}
+      {{ end -}}
+      {{ range $value := (.TAGS | trim | splitList " " | compact) -}}
+      --tag {{ $.NAME }}:{{ $value }}
+      {{ end -}}
+      {{ .CLI_ARGS }}
+      {{ .CONTEXT | q }}
+    sources:
+    - '{{ .DOCKERFILE }}'
+  lint:
+    summary: >-
+      Statically analyses a container image Dockerfile.
+
+      Uses hadolint and reports to standar out.
+    preconditions:
+    - sh: command -v hadolint &> /dev/null
+      msg: Binary 'hadolint' not found.
+    - sh: test -f {{ .DOCKERFILE | q }}
+      msg: File {{ .DOCKERFILE | squote }} not found.
+    vars:
+      DOCKERFILE: '{{ .DOCKERFILE | default "Dockerfile" }}'
+    cmd: hadolint -f json {{ .DOCKERFILE | q }}
+  lint:sarif:
+    summary: >-
+      Statically analyses a container image Dockerfile.
+
+      Uses hadolint, hadolint-sarif, sarif-fmt and jq to convert results to
+      SARIF as a side-effect while still reporting to standard out and erroring
+      accordingly.
+    preconditions:
+    - sh: command -v hadolint &> /dev/null
+      msg: Binary 'hadolint' not found.
+    - sh: command -v hadolint-sarif &> /dev/null
+      msg: Binary 'hadolint-sarif' not found.
+    - sh: command -v tee &> /dev/null
+      msg: Binary 'tee' not found.
+    - sh: command -v sarif-fmt &> /dev/null
+      msg: Binary 'sarif-fmt' not found.
+    - sh: command -v jq &> /dev/null
+      msg: Binary 'jq' not found.
+    - sh: test -f {{ .DOCKERFILE | q }}
+      msg: File {{ .DOCKERFILE | squote }} not found.
+    vars:
+      DOCKERFILE: '{{ .DOCKERFILE | default "Dockerfile" }}'
+      HADOLINT_SARIF: '{{ .HADOLINT_SARIF | default "hadolint.sarif" }}'
+    cmd: >-
+      hadolint -f json {{ .DOCKERFILE | q }}
+      | hadolint-sarif
+      | tee {{ .HADOLINT_SARIF | q }}
+      | sarif-fmt
+      ; jq -e '[.runs[].results[] | select(.level == "error")] | length | . == 0'
+      {{ .HADOLINT_SARIF | q }} > /dev/null
+    sources:
+    - '{{ .DOCKERFILE }}'
+    generates:
+    - '{{ .HADOLINT_SARIF }}'
+  load:
+    desc: Builds and loads a container image locally.
+    cmd:
+      task: build
+      vars:
+        CLI_ARGS: --load
+  push:
+    desc: Builds and pushes a multi-platform container image.
+    cmd:
+      task: build
+      vars:
+        CLI_ARGS: --push
+  run:
+    desc: Runs an interactive container.
+    interactive: true
+    ignore_error: true
+    requires:
+      vars:
+      - NAME
+    vars:
+      TAG: '{{ .TAG | default "latest" }}'
+    preconditions:
+    - sh: command -v docker &> /dev/null
+      msg: Binary 'docker' not found.
+    deps:
+    - build
+    cmd: >-
+      docker run --rm -it {{ .DOCKER_RUN_CLI_ARGS }}
+      {{ .NAME }}:{{ .TAG }} {{ .CLI_ARGS }}
+  test:
+    desc: Tests a container image structure.
+    requires:
+      vars:
+      - NAME
+    preconditions:
+    - sh: command -v container-structure-test &> /dev/null
+      msg: Binary 'container-structure-test' not found.
+    - sh: command -v docker &> /dev/null
+      msg: Binary 'docker' not found.
+    - sh: test -f {{ .CONFIG | q }}
+      msg: Configuration file {{ .CONFIG | squote }} not found.
+    - sh: docker image inspect {{ .NAME }}:{{ .TAG }} > /dev/null
+      msg: Container image {{ printf "%s:%s" .NAME .TAG | squote }} not found.
+    vars:
+      CONFIG: '{{ .CONFIG | default "container-structure-test.yaml" }}'
+      TAG: '{{ .TAG | default "latest" }}'
+    cmd: >-
+      container-structure-test test
+      -c {{ .CONFIG | q }}
+      -i {{ .NAME }}:{{ .TAG }}

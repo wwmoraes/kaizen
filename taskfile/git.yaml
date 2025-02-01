@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+vars:
+  REVISION:
+    sh: git rev-parse --verify HEAD
+  VERSION:
+    sh: git describe --tags --always
+  BRANCH:
+    sh: git branch --show-current
+
+tasks:
+  hooks:clean:
+    summary: Removes git hooks from the local repository.
+    method: none
+    run: once
+    vars:
+      GIT_CORE_HOOKSPATH:
+        sh: git rev-parse --git-path hooks
+    deps:
+    - for: sources
+      task: :gnu:rm:file:{{ .ITEM }}
+    sources:
+    - '{{ .GIT_CORE_HOOKSPATH | osClean }}/*'
+  hooks:install:
+    desc: Configures repository git hooks.
+    vars:
+      GIT_CORE_HOOKSPATH:
+        sh: git rev-parse --git-path hooks
+    cmds:
+    - task: hooks:clean
+    - cog install-hook --all --overwrite
+    sources:
+    - cog.toml
+    generates:
+    - '{{ .GIT_CORE_HOOKSPATH | osClean }}/*'
+  hooks:pre-commit:
+    summary: Executes tasks that validate changes before a commit.
+    deps:
+    - for:
+        var: GIT_PRE_COMMIT_TASKS
+      task: ':{{ .ITEM }}'
+  hooks:pre-push:
+    summary: Executes tasks that validate changes before a push.
+    deps:
+    - for:
+        var: GIT_PRE_PUSH_TASKS
+      task: ':{{ .ITEM }}'
+  lint:
+    vars:
+      REMOTE:
+        sh: git remote
+      LOCAL_BRANCH:
+        sh: git branch --show-current
+      REMOTE_BRANCH:
+        sh: git rev-parse --symbolic-full-name @{u} || echo -n "{{ .DEFAULT }}"
+      DEFAULT:
+        sh: >-
+          git remote set-head origin --auto;
+          git symbolic-ref refs/remotes/{{ .REMOTE }}/HEAD
+    cmd: cog check {{ .REMOTE_BRANCH }}..{{ .LOCAL_BRANCH }}
+    sources:
+    - .git/logs/HEAD
+

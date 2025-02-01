@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+tasks:
+  fix:
+    desc: Fixes markdown files.
+    run: when_changed
+    cmd: markdownlint --fix "**.md"
+    sources:
+    - "**/*.md"
+  lint:
+    summary: Lints markdown files.
+    run: when_changed
+    cmd: markdownlint "**.md"
+    sources:
+    - "**/*.md"

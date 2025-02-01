@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+tasks:
+  mkdir:*:
+    silent: true
+    label: gnu:mkdir:{{ .TARGET }}
+    prefix: gnu:mkdir:{{ .TARGET }}
+    vars:
+      TARGET: '{{ index .MATCH 0 }}'
+    cmd: mkdir -p {{ .TARGET | q }}
+    status:
+    - test -d {{ .TARGET | q }}
+  rm:dir:*:
+    silent: true
+    label: gnu:rm:dir:{{ .TARGET }}
+    vars:
+      TARGET: '{{ index .MATCH 0 }}'
+    cmd: rm -rf {{ .TARGET | q }}
+    status:
+    - test ! -d {{ .TARGET | q }}
+  rm:file:*:
+    silent: true
+    label: gnu:rm:file:{{ .TARGET }}
+    prefix: gnu:rm:file:{{ .TARGET }}
+    vars:
+      TARGET: '{{ index .MATCH 0 }}'
+    cmd: rm -f {{ .TARGET | q }}
+    status:
+    - test ! -f {{ .TARGET | q }}
+  which:*:
+    silent: true
+    label: gnu:which:{{ .TARGET }}
+    prefix: gnu:which:{{ .TARGET }}
+    vars:
+      TARGET: '{{ index .MATCH 0 }}'
+    cmds:
+    - echo "{{ .TARGET | q }} not found"
+    - exit 1
+    status:
+    - /usr/bin/command -v {{ .TARGET | q }}
+
