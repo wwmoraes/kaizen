@@ -8,3 +8,21 @@ tasks:
     vars:
       NAME: '{{ index .MATCH 0 }}'
     cmd: nix-build default.nix -A {{ .NAME }} --no-out-link
+  schema:build:
+    desc: Convert all YAML schemas to JSON.
+    deps:
+    - for: sources
+      task: schema:{{ .ITEM }}:build
+    sources:
+    - schemas/*.schema.yaml
+  schema:*:build:
+    label: schema:{{ .NAME }}:build
+    vars:
+      NAME: '{{ index .MATCH 0 | base | trimSuffix ".schema.yaml" }}'
+      SOURCE: '{{ index .MATCH 0 }}'
+      TARGET: '{{ index .MATCH 0 | trimSuffix ".yaml" }}.json'
+    cmd: yq -Poj {{ .SOURCE | q }} > {{ .TARGET | q }}
+    sources:
+    - '{{ .SOURCE }}'
+    generates:
+    - '{{ .TARGET }}'

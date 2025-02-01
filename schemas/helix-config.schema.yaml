@@ -1,0 +1,1597 @@
+# yaml-language-server: $schema=http://json-schema.org/draft-07/schema
+$schema: http://json-schema.org/draft-07/schema
+additionalProperties: false
+definitions:
+  CursorShape:
+    additionalProperties: false
+    description: Defines the shape of cursor in each mode.
+    properties: 
+      insert:
+        $ref: '#/definitions/CursorShapeOption'
+        description: Cursor shape in insert mode
+      normal:
+        $ref: '#/definitions/CursorShapeOption'
+        description: Cursor shape in normal mode
+      select:
+        $ref: '#/definitions/CursorShapeOption'
+        description: Cursor shape in select mode
+    type: object
+  CursorShapeOption:
+    enum:
+    - bar
+    - block
+    - hidden
+    - underline
+    type: string
+  Editor:
+    additionalProperties: false
+    properties:
+      auto-completion:
+        default: true
+        description: Enable automatic pop up of auto-completion
+        type: boolean
+      auto-format:
+        default: true
+        description: Enable automatic formatting on save
+        type: boolean
+      auto-info:
+        default: true
+        description: Whether to display info boxes
+        type: boolean
+      auto-pairs:
+        description: >-
+          Enables automatic insertion of pairs to parentheses, brackets, etc.
+          Can be a simple boolean value, or a specific mapping of pairs of
+          single characters.
+        oneOf:
+        - default: false
+          type: boolean
+        - default:
+            '(': ')'
+            '{': '}'
+            '[': ']'
+            "'": "'"
+            '"': '"'
+            '`': '`'
+          type: object
+          patternProperties: 
+            '^.$':
+              type: string
+              pattern: '^.$'
+          additionalProperties:
+            uniqueItems: true
+        type: object
+      auto-save:
+        default: false
+        description: Enables auto-saving.
+        type: boolean
+      bufferline:
+        enum:
+        - always
+        - never
+        - multiple
+        default: never
+        description: >-
+          Renders a line at the top of the editor displaying open buffers. Can
+          be always, never or multiple (only shown if more than one buffer is
+          in use)
+        type: string
+      color-modes:
+        default: false
+        description: >-
+          Whether to color the mode indicator with different colors depending on
+          the mode itself
+        type: boolean
+      completion-replace:
+        default: false
+        description: >-
+          Set to true to make completions always replace the entire word and not
+          just the part before the cursor
+        type: boolean
+      completion-timeout:
+        default: 250
+        description: >-
+          Time in milliseconds after typing a word character before completions
+          are shown, set to 5 for instant.
+        type: integer
+      completion-trigger-len:
+        default: 2
+        description: >-
+          The min-length of word under cursor to trigger autocompletion
+        type: integer
+      cursor-shape:
+        $ref: '#/definitions/CursorShape'
+      cursorcolumn:
+        default: false
+        description: Highlight all columns with a cursor
+        type: boolean
+      cursorline:
+        default: false
+        description: Highlight all lines with a cursor
+        type: boolean
+      default-line-ending:
+        enum:
+        - native
+        - lf
+        - cflf
+        - ff
+        - cr
+        - nel
+        default: native
+        description: >-
+          The line ending to use for new documents. Can be native, lf, crlf,
+          ff, cr or nel. native uses the platform's native line ending (crlf on
+          Windows, otherwise lf).
+        type: string
+      file-picker:
+        $ref: '#/definitions/FilePicker'
+      gutters:
+        $ref: '#/definitions/Gutters'
+      idle-timeout:
+        default: 250
+        description: >-
+          Time in milliseconds since last keypress before idle timers trigger.
+        type: integer
+      indent-guides:
+        $ref: '#/definitions/IndentGuides'
+      indent-heuristic:
+        enum:
+        - simple
+        - tree-sitter
+        - hybrid
+        default: hybrid
+        description: >-
+          How the indentation for a newly inserted line is computed: simple
+          just copies the indentation level from the previous line, tree-sitter
+          computes the indentation based on the syntax tree and hybrid combines
+          both approaches. If the chosen heuristic is not available, a different
+          one will be used as a fallback (the fallback order being hybrid ->
+          tree-sitter -> simple).
+        type: string
+      insert-final-newline:
+        default: true
+        description: >-
+          Whether to automatically insert a trailing line-ending on write if
+          missing
+        type: boolean
+      jump-label-alphabet:
+        default: abcdefghijklmnopqrstuvwxyz
+        description: >-
+          The characters that are used to generate two character jump labels.
+          Characters at the start of the alphabet are used first.
+        type: string
+      line-number:
+        default: absolute
+        description: >-
+          Line number display: absolute simply shows each line's number, while
+          relative shows the distance from the current line. When unfocused or
+          in insert mode, relative will still show absolute line numbers
+        enum:
+         - absolute
+         - relative
+        type: string
+      lsp:
+        $ref: '#/definitions/LSP'
+      middle-click-paste:
+        default: true
+        description: Middle click paste support
+        type: boolean
+      mouse:
+        default: true
+        description: Enable mouse mode
+        type: boolean
+      popup-border:
+        enum:
+        - popup
+        - menu
+        - all
+        - none
+        default: none
+        description: Draw border around popup, menu, all, or none
+        type: string
+      preview-completion-insert:
+        default: true
+        description: Whether to apply completion item instantly when selected
+        type: boolean
+      rulers:
+        default: []
+        description: >-
+          List of column positions at which to display the rulers. Can be
+          overridden by language specific rulers in languages.toml file
+        items:
+          type: integer
+        type: array
+      search:
+        $ref: '#/definitions/Search'
+      scroll-lines:
+        default: 3
+        description: Number of lines to scroll per scroll wheel step
+        type: integer
+      scrolloff:
+        default: 5
+        description: >-
+          Number of lines of padding around the edge of the screen when
+          scrolling
+        type: integer
+      shell:
+        description: Shell to use when running external commands
+        examples:
+        - - sh
+          - '-c'
+        - - cmd
+          - /C
+        items:
+          type: string
+        type: array
+      smart-tab:
+        $ref: '#/definitions/SmartTab'
+      soft-wrap:
+        $ref: '#/definitions/SoftWrap'
+      statusline:
+        $ref: '#/definitions/EditorStatusline'
+      text-width:
+        default: 80
+        description: >-
+          Maximum line length. Used for the :reflow command and soft-wrapping if
+          soft-wrap.wrap-at-text-width is set
+        type: integer
+      true-color:
+        default: false
+        description: >-
+          Set to true to override automatic detection of terminal truecolor
+          support in the event of a false negative
+        type: boolean
+      undercurl:
+        default: false
+        description: >-
+          Set to true to override automatic detection of terminal undercurl
+          support in the event of a false negative
+        type: boolean
+      whitespace:
+        $ref: '#/definitions/Whitespace'
+      workspace-lsp-roots:
+        default: []
+        description: >-
+          Directories relative to the workspace root that are treated as LSP
+          roots. Should only be set in .helix/config.toml
+        type: array
+    type: object
+  EditorStatusline:
+    additionalProperties: false
+    description: >-
+      Allows configuring the statusline at the bottom of the editor.
+
+      It distinguishes between three areas of the status line:
+
+      [ ... LEFT ... | ... CENTER ... | ... RIGHT ... ]
+    properties:
+      center:
+        $ref: "#/definitions/StatusLineElements"
+        default: []
+        description: >-
+          A list of elements aligned to the middle of the statusline
+      left:
+        $ref: "#/definitions/StatusLineElements"
+        default:
+        - mode
+        - spinner
+        - file-name
+        - read-only-indicator
+        - file-modification-indicator
+        description: >-
+          A list of elements aligned to the left of the statusline
+      mode:
+        $ref: '#/definitions/Mode'
+      right:
+        $ref: "#/definitions/StatusLineElements"
+        default:
+        - diagnostics
+        - selections
+        - register
+        - position
+        - file-encoding
+        description: >-
+          A list of elements aligned to the right of the statusline
+      separator:
+        default: "|"
+        description: >-
+          The character used to separate elements in the statusline
+        type: string
+    type: object
+  FilePicker:
+    additionalProperties: false
+    description: >-
+      Set options for file picker and global search. Ignoring a file means it is
+      not visible in the Helix file picker and global search.
+
+      All git related options are only enabled in a git repository.
+    properties: 
+      deduplicate-links:
+        default: true
+        description: >-
+          Ignore symlinks that point at files already shown in the picker
+        type: boolean
+      follow-symlinks:
+        default: true
+        description: Follow symlinks instead of ignoring them
+        type: boolean
+      git-exclude:
+        default: true
+        description: Enables reading .git/info/exclude files
+        type: boolean
+      git-global:
+        default: true
+        description: >-
+          Enables reading global .gitignore, whose path is specified in git's
+          config: core.excludesfile option
+        type: boolean
+      git-ignore:
+        default: true
+        description: Enables reading .gitignore files
+        type: boolean
+      hidden:
+        default: true
+        description: Enables ignoring hidden files
+        type: boolean
+      ignore:
+        default: true
+        description: >-
+          Enables reading .ignore files.
+
+          Ignore files can be placed locally as .ignore or put in your home
+          directory as ~/.ignore. They support the usual ignore and negative
+          ignore (unignore) rules used in .gitignore files.
+
+          Additionally, you can use Helix-specific ignore files by creating a
+          local .helix/ignore file in the current workspace or a global ignore
+          file located in your Helix config directory:
+
+          - Linux and Mac: ~/.config/helix/ignore
+          - Windows: %AppData%\helix\ignore
+        type: boolean
+      max-depth:
+        description: Set with an integer value for maximum depth to recurse
+        type: integer
+      parents:
+        default: true
+        description: Enables reading ignore files from parent directories
+        type: boolean
+    type: object
+  Gutters:
+    description: >-
+      Gutters to display. Diagnostics also includes other features like
+      breakpoints, 1-width padding will be inserted if gutters is non-empty.
+
+      For simplicity, it accepts an array of gutter types, which will use
+      default settings for all gutter components.
+
+      To customize the behavior of gutters, use the section format. It contains
+      top level settings, as well as settings for specific gutter components
+      as subsections.
+    oneOf:
+    - $ref: '#/definitions/GutterElements'
+    - $ref: '#/definitions/GuttersSection'
+  GutterElements:
+    description: A vector of gutters to display
+    items:
+      oneOf:
+      - const: diagnostics
+      - const: diff
+      - const: line-numbers
+      - const: spacer
+      type: string
+    type: array
+  GuttersSection:
+    additionalProperties: false
+    properties:
+      diagnostics:
+        additionalProperties: false
+        description: Currently unused
+        type: object
+      diff:
+        additionalProperties: false
+        description: >-
+          The diff gutter option displays colored bars indicating whether a
+          git diff represents that a line was added, removed or changed. These
+          colors are controlled by the theme attributes diff.plus, diff.minus
+          and diff.delta.
+
+          Other diff providers will eventually be supported by a future plugin
+          system.
+
+          There are currently no options for this section.
+        type: object
+      layout:
+        $ref: '#/definitions/GutterElements'
+      line-numbers:
+        additionalProperties: false
+        description: Options for the line number gutter
+        properties:
+          min-width:
+            default: 3
+            description: The minimum number of characters to use
+            type: integer
+        type: object
+      spacer:
+        additionalProperties: false
+        description: Currently unused
+        type: object
+    type: object
+  IndentGuides:
+    additionalProperties: false
+    properties:
+      character:
+        default: "|"
+        description: Literal character to use for rendering the indent guide
+        pattern: ^.$
+        type: string
+      render:
+        default: false
+        description: Whether to render indent guides
+        type: boolean
+      skip-levels:
+        default: 0
+        description: Number of indent levels to skip
+        type: integer
+    type: object
+  Keys:
+    additionalProperties: false
+    description: Key mapping settings
+    properties:
+      insert:
+        $ref: '#/definitions/MajorMode'
+        description: Insert mode key mappings
+      normal:
+        $ref: '#/definitions/MajorMode'
+        description: Normal mode key mappings
+      select:
+        $ref: '#/definitions/MajorMode'
+        description: Select mode key mappings
+    type: object
+  MajorMode:
+    description: Major mode key mappings
+    patternProperties: 
+      ^.*$:
+        oneOf:
+        - $ref: '#/definitions/Command'
+        - $ref: '#/definitions/ChainedCommands'
+        - $ref: '#/definitions/MinorMode'
+    type: object
+  MinorMode:
+    description: Minor mode key mappings
+    patternProperties: 
+      ^.*$:
+        oneOf:
+        - $ref: '#/definitions/Command'
+        - $ref: '#/definitions/ChainedCommands'
+    type: object
+  Command:
+    description: Single or sequence of commands to run.
+    oneOf:
+    - $ref: '#/definitions/BuiltInCommand'
+    - $ref: '#/definitions/KeymapCommand'
+    - type: string
+  ChainedCommands:
+    items:
+      $ref: '#/definitions/Command'
+    type: array
+  BuiltInCommand:
+    description: Built-in command.
+    oneOf:
+    - const: ':quit'
+      description: Close the current view.
+    - const: ':q'
+      description: Close the current view.
+    - const: ':quit!'
+      description: 'Force close the current view, ignoring unsaved changes.'
+    - const: ':q!'
+      description: 'Force close the current view, ignoring unsaved changes.'
+    - const: ':open'
+      description: Open a file from disk into the current view.
+    - const: ':o'
+      description: Open a file from disk into the current view.
+    - const: ':buffer-close'
+      description: Close the current buffer.
+    - const: ':bc'
+      description: Close the current buffer.
+    - const: ':bclose'
+      description: Close the current buffer.
+    - const: ':buffer-close!'
+      description: 'Close the current buffer forcefully, ignoring unsaved changes.'
+    - const: ':bc!'
+      description: 'Close the current buffer forcefully, ignoring unsaved changes.'
+    - const: ':bclose!'
+      description: 'Close the current buffer forcefully, ignoring unsaved changes.'
+    - const: ':buffer-close-others'
+      description: Close all buffers but the currently focused one.
+    - const: ':bco'
+      description: Close all buffers but the currently focused one.
+    - const: ':bcloseother'
+      description: Close all buffers but the currently focused one.
+    - const: ':buffer-close-others!'
+      description: Force close all buffers but the currently focused one.
+    - const: ':bco!'
+      description: Force close all buffers but the currently focused one.
+    - const: ':bcloseother!'
+      description: Force close all buffers but the currently focused one.
+    - const: ':buffer-close-all'
+      description: Close all buffers without quitting.
+    - const: ':bca'
+      description: Close all buffers without quitting.
+    - const: ':bcloseall'
+      description: Close all buffers without quitting.
+    - const: ':buffer-close-all!'
+      description: Force close all buffers ignoring unsaved changes without quitting.
+    - const: ':bca!'
+      description: Force close all buffers ignoring unsaved changes without quitting.
+    - const: ':bcloseall!'
+      description: Force close all buffers ignoring unsaved changes without quitting.
+    - const: ':buffer-next'
+      description: Goto next buffer.
+    - const: ':bn'
+      description: Goto next buffer.
+    - const: ':bnext'
+      description: Goto next buffer.
+    - const: ':buffer-previous'
+      description: Goto previous buffer.
+    - const: ':bp'
+      description: Goto previous buffer.
+    - const: ':bprev'
+      description: Goto previous buffer.
+    - const: ':write'
+      description: 'Write changes to disk. Accepts an optional path (:write some/path.txt)'
+    - const: ':w'
+      description: 'Write changes to disk. Accepts an optional path (:write some/path.txt)'
+    - const: ':write!'
+      description: >-
+        Force write changes to disk creating necessary subdirectories. Accepts an
+        optional path (:write! some/path.txt)
+    - const: ':w!'
+      description: >-
+        Force write changes to disk creating necessary subdirectories. Accepts an
+        optional path (:write! some/path.txt)
+    - const: ':write-buffer-close'
+      description: >-
+        Write changes to disk and closes the buffer. Accepts an optional path
+        (:write-buffer-close some/path.txt)
+    - const: ':wbc'
+      description: >-
+        Write changes to disk and closes the buffer. Accepts an optional path
+        (:write-buffer-close some/path.txt)
+    - const: ':write-buffer-close!'
+      description: >-
+        Force write changes to disk creating necessary subdirectories and closes the
+        buffer. Accepts an optional path (:write-buffer-close! some/path.txt)
+    - const: ':wbc!'
+      description: >-
+        Force write changes to disk creating necessary subdirectories and closes the
+        buffer. Accepts an optional path (:write-buffer-close! some/path.txt)
+    - const: ':new'
+      description: Create a new scratch buffer.
+    - const: ':n'
+      description: Create a new scratch buffer.
+    - const: ':format'
+      description: Format the file using the LSP formatter.
+    - const: ':fmt'
+      description: Format the file using the LSP formatter.
+    - const: ':indent-style'
+      description: >-
+        Set the indentation style for editing. ('t' for tabs or 1-16 for number of
+        spaces.)
+    - const: ':line-ending'
+      description: 'Set the document''s default line ending. Options: crlf, lf.'
+    - const: ':earlier'
+      description: >-
+        Jump back to an earlier point in edit history. Accepts a number of steps or
+        a time span.
+    - const: ':ear'
+      description: >-
+        Jump back to an earlier point in edit history. Accepts a number of steps or
+        a time span.
+    - const: ':later'
+      description: >-
+        Jump to a later point in edit history. Accepts a number of steps or a time
+        span.
+    - const: ':lat'
+      description: >-
+        Jump to a later point in edit history. Accepts a number of steps or a time
+        span.
+    - const: ':write-quit'
+      description: >-
+        Write changes to disk and close the current view. Accepts an optional path
+        (:wq some/path.txt)
+    - const: ':wq'
+      description: >-
+        Write changes to disk and close the current view. Accepts an optional path
+        (:wq some/path.txt)
+    - const: ':x'
+      description: >-
+        Write changes to disk and close the current view. Accepts an optional path
+        (:wq some/path.txt)
+    - const: ':write-quit!'
+      description: >-
+        Write changes to disk and close the current view forcefully. Accepts an
+        optional path (:wq! some/path.txt)
+    - const: ':wq!'
+      description: >-
+        Write changes to disk and close the current view forcefully. Accepts an
+        optional path (:wq! some/path.txt)
+    - const: ':x!'
+      description: >-
+        Write changes to disk and close the current view forcefully. Accepts an
+        optional path (:wq! some/path.txt)
+    - const: ':write-all'
+      description: Write changes from all buffers to disk.
+    - const: ':wa'
+      description: Write changes from all buffers to disk.
+    - const: ':write-all!'
+      description: >-
+        Forcefully write changes from all buffers to disk creating necessary
+        subdirectories.
+    - const: ':wa!'
+      description: >-
+        Forcefully write changes from all buffers to disk creating necessary
+        subdirectories.
+    - const: ':write-quit-all'
+      description: Write changes from all buffers to disk and close all views.
+    - const: ':wqa'
+      description: Write changes from all buffers to disk and close all views.
+    - const: ':xa'
+      description: Write changes from all buffers to disk and close all views.
+    - const: ':write-quit-all!'
+      description: >-
+        Write changes from all buffers to disk and close all views forcefully
+        (ignoring unsaved changes).
+    - const: ':wqa!'
+      description: >-
+        Write changes from all buffers to disk and close all views forcefully
+        (ignoring unsaved changes).
+    - const: ':xa!'
+      description: >-
+        Write changes from all buffers to disk and close all views forcefully
+        (ignoring unsaved changes).
+    - const: ':quit-all'
+      description: Close all views.
+    - const: ':qa'
+      description: Close all views.
+    - const: ':quit-all!'
+      description: Force close all views ignoring unsaved changes.
+    - const: ':qa!'
+      description: Force close all views ignoring unsaved changes.
+    - const: ':cquit'
+      description: >-
+        Quit with exit code (default 1). Accepts an optional integer exit code (:cq
+        2).
+    - const: ':cq'
+      description: >-
+        Quit with exit code (default 1). Accepts an optional integer exit code (:cq
+        2).
+    - const: ':cquit!'
+      description: >-
+        Force quit with exit code (default 1) ignoring unsaved changes. Accepts an
+        optional integer exit code (:cq! 2).
+    - const: ':cq!'
+      description: >-
+        Force quit with exit code (default 1) ignoring unsaved changes. Accepts an
+        optional integer exit code (:cq! 2).
+    - const: ':theme'
+      description: Change the editor theme (show current theme if no name specified).
+    - const: ':yank-join'
+      description: >-
+        Yank joined selections. A separator can be provided as first argument.
+        Default value is newline.
+    - const: ':clipboard-yank'
+      description: Yank main selection into system clipboard.
+    - const: ':clipboard-yank-join'
+      description: >-
+        Yank joined selections into system clipboard. A separator can be provided as
+        first argument. Default value is newline.
+    - const: ':primary-clipboard-yank'
+      description: Yank main selection into system primary clipboard.
+    - const: ':primary-clipboard-yank-join'
+      description: >-
+        Yank joined selections into system primary clipboard. A separator can be
+        provided as first argument. Default value is newline.
+    - const: ':clipboard-paste-after'
+      description: Paste system clipboard after selections.
+    - const: ':clipboard-paste-before'
+      description: Paste system clipboard before selections.
+    - const: ':clipboard-paste-replace'
+      description: Replace selections with content of system clipboard.
+    - const: ':primary-clipboard-paste-after'
+      description: Paste primary clipboard after selections.
+    - const: ':primary-clipboard-paste-before'
+      description: Paste primary clipboard before selections.
+    - const: ':primary-clipboard-paste-replace'
+      description: Replace selections with content of system primary clipboard.
+    - const: ':show-clipboard-provider'
+      description: Show clipboard provider name in status bar.
+    - const: ':change-current-directory'
+      description: Change the current working directory.
+    - const: ':cd'
+      description: Change the current working directory.
+    - const: ':show-directory'
+      description: Show the current working directory.
+    - const: ':pwd'
+      description: Show the current working directory.
+    - const: ':encoding'
+      description: 'Set encoding. Based on https://encoding.spec.whatwg.org.'
+    - const: 'https://encoding.spec.whatwg.org'
+      description: 'Set encoding. Based on https://encoding.spec.whatwg.org.'
+    - const: ':character-info'
+      description: Get info about the character under the primary cursor.
+    - const: ':char'
+      description: Get info about the character under the primary cursor.
+    - const: ':reload'
+      description: Discard changes and reload from the source file.
+    - const: ':rl'
+      description: Discard changes and reload from the source file.
+    - const: ':reload-all'
+      description: Discard changes and reload all documents from the source files.
+    - const: ':rla'
+      description: Discard changes and reload all documents from the source files.
+    - const: ':update'
+      description: Write changes only if the file has been modified.
+    - const: ':u'
+      description: Write changes only if the file has been modified.
+    - const: ':lsp-workspace-command'
+      description: Open workspace command picker
+    - const: ':lsp-restart'
+      description: Restarts the language servers used by the current doc
+    - const: ':lsp-stop'
+      description: Stops the language servers that are used by the current doc
+    - const: ':tree-sitter-scopes'
+      description: 'Display tree sitter scopes, primarily for theming and development.'
+    - const: ':tree-sitter-highlight-name'
+      description: Display name of tree-sitter highlight scope under the cursor.
+    - const: ':debug-start'
+      description: Start a debug session from a given template with given parameters.
+    - const: ':dbg'
+      description: Start a debug session from a given template with given parameters.
+    - const: ':debug-remote'
+      description: >-
+        Connect to a debug adapter by TCP address and start a debugging session from
+        a given template with given parameters.
+    - const: ':dbg-tcp'
+      description: >-
+        Connect to a debug adapter by TCP address and start a debugging session from
+        a given template with given parameters.
+    - const: ':debug-eval'
+      description: Evaluate expression in current debug context.
+    - const: ':vsplit'
+      description: Open the file in a vertical split.
+    - const: ':vs'
+      description: Open the file in a vertical split.
+    - const: ':vsplit-new'
+      description: Open a scratch buffer in a vertical split.
+    - const: ':vnew'
+      description: Open a scratch buffer in a vertical split.
+    - const: ':hsplit'
+      description: Open the file in a horizontal split.
+    - const: ':hs'
+      description: Open the file in a horizontal split.
+    - const: ':sp'
+      description: Open the file in a horizontal split.
+    - const: ':hsplit-new'
+      description: Open a scratch buffer in a horizontal split.
+    - const: ':hnew'
+      description: Open a scratch buffer in a horizontal split.
+    - const: ':tutor'
+      description: Open the tutorial.
+    - const: ':goto'
+      description: Goto line number.
+    - const: ':g'
+      description: Goto line number.
+    - const: ':set-language'
+      description: >-
+        Set the language of current buffer (show current language if no value
+        specified).
+    - const: ':lang'
+      description: >-
+        Set the language of current buffer (show current language if no value
+        specified).
+    - const: ':set-option'
+      description: |-
+        Set a config option at runtime.
+        For example to disable smart case search, use :set search.smart-case false.
+    - const: ':set'
+      description: |-
+        Set a config option at runtime.
+        For example to disable smart case search, use :set search.smart-case false.
+    - const: ':set search.smart-case false'
+      description: |-
+        Set a config option at runtime.
+        For example to disable smart case search, use :set search.smart-case false.
+    - const: ':toggle-option'
+      description: |-
+        Toggle a boolean config option at runtime.
+        For example to toggle smart case search, use :toggle search.smart-case.
+    - const: ':toggle'
+      description: |-
+        Toggle a boolean config option at runtime.
+        For example to toggle smart case search, use :toggle search.smart-case.
+    - const: ':toggle search.smart-case'
+      description: |-
+        Toggle a boolean config option at runtime.
+        For example to toggle smart case search, use :toggle search.smart-case.
+    - const: ':get-option'
+      description: Get the current value of a config option.
+    - const: ':get'
+      description: Get the current value of a config option.
+    - const: ':sort'
+      description: Sort ranges in selection.
+    - const: ':rsort'
+      description: Sort ranges in selection in reverse order.
+    - const: ':reflow'
+      description: Hard-wrap the current selection of lines to a given width.
+    - const: ':tree-sitter-subtree'
+      description: 'Display tree sitter subtree under cursor, primarily for debugging queries.'
+    - const: ':ts-subtree'
+      description: 'Display tree sitter subtree under cursor, primarily for debugging queries.'
+    - const: ':config-reload'
+      description: Refresh user config.
+    - const: ':config-open'
+      description: Open the user config.toml file.
+    - const: ':config-open-workspace'
+      description: Open the workspace config.toml file.
+    - const: ':log-open'
+      description: Open the helix log file.
+    - const: ':insert-output'
+      description: 'Run shell command, inserting output before each selection.'
+    - const: ':append-output'
+      description: 'Run shell command, appending output after each selection.'
+    - const: ':pipe'
+      description: Pipe each selection to the shell command.
+    - const: ':pipe-to'
+      description: 'Pipe each selection to the shell command, ignoring output.'
+    - const: ':run-shell-command'
+      description: Run a shell command
+    - const: ':sh'
+      description: Run a shell command
+    - const: ':reset-diff-change'
+      description: Reset the diff change at the cursor position.
+    - const: ':diffget'
+      description: Reset the diff change at the cursor position.
+    - const: ':diffg'
+      description: Reset the diff change at the cursor position.
+    - const: ':clear-register'
+      description: 'Clear given register. If no argument is provided, clear all registers.'
+    - const: ':redraw'
+      description: Clear and re-render the whole UI
+    - const: ':move'
+      description: Move the current buffer and its corresponding file to a different path
+    - const: ':yank-diagnostic'
+      description: 'Yank diagnostic(s) under primary cursor to register, or clipboard by default'
+    - const: ':read'
+      description: Load a file into buffer
+    - const: ':r'
+      description: Load a file into buffer
+    type: string
+  KeymapCommand:
+    description: Keymap command.
+    oneOf:
+    - const: no_op
+      description: Disables the key mapping
+    - const: move_char_left
+      description: Move left
+    - const: move_visual_line_down
+      description: Move down
+    - const: move_visual_line_up
+      description: Move up
+    - const: move_char_right
+      description: Move right
+    - const: move_next_word_start
+      description: Move next word start
+    - const: move_prev_word_start
+      description: Move previous word start
+    - const: move_next_word_end
+      description: Move next word end
+    - const: move_next_long_word_start
+      description: Move next WORD start
+    - const: move_prev_long_word_start
+      description: Move previous WORD start
+    - const: move_next_long_word_end
+      description: Move next WORD end
+    - const: find_till_char
+      description: Find 'till next char
+    - const: find_next_char
+      description: Find next char
+    - const: till_prev_char
+      description: Find 'till previous char
+    - const: find_prev_char
+      description: Find previous char
+    - const: goto_line
+      description: Go to line number <n>
+    - const: repeat_last_motion
+      description: 'Repeat last motion (f, t, m, [ or ])'
+    - const: goto_line_start
+      description: Move to the start of the line
+    - const: goto_line_end
+      description: Move to the end of the line
+    - const: page_up
+      description: Move page up
+    - const: page_down
+      description: Move page down
+    - const: page_cursor_half_up
+      description: Move cursor and page half page up
+    - const: page_cursor_half_down
+      description: Move cursor and page half page down
+    - const: jump_forward
+      description: Jump forward on the jumplist
+    - const: jump_backward
+      description: Jump backward on the jumplist
+    - const: save_selection
+      description: Save the current selection to the jumplist
+    - const: replace
+      description: Replace with a character
+    - const: replace_with_yanked
+      description: Replace with yanked text
+    - const: switch_case
+      description: Switch case of the selected text
+    - const: switch_to_lowercase
+      description: Set the selected text to lower case
+    - const: switch_to_uppercase
+      description: Set the selected text to upper case
+    - const: insert_mode
+      description: Insert before selection
+    - const: append_mode
+      description: Insert after selection (append)
+    - const: insert_at_line_start
+      description: Insert at the start of the line
+    - const: insert_at_line_end
+      description: Insert at the end of the line
+    - const: open_below
+      description: Open new line below selection
+    - const: open_above
+      description: Open new line above selection
+    - const: N/A
+      description: Repeat last insert
+    - const: undo
+      description: Undo change
+    - const: redo
+      description: Redo change
+    - const: earlier
+      description: Move backward in history
+    - const: later
+      description: Move forward in history
+    - const: yank
+      description: Yank selection
+    - const: paste_after
+      description: Paste after selection
+    - const: paste_before
+      description: Paste before selection
+    - const: select_register
+      description: Select a register to yank to or paste from
+    - const: indent
+      description: Indent selection
+    - const: unindent
+      description: Unindent selection
+    - const: format_selections
+      description: Format selection (LSP)
+    - const: delete_selection
+      description: Delete selection
+    - const: delete_selection_noyank
+      description: 'Delete selection, without yanking'
+    - const: change_selection
+      description: Change selection (delete and enter insert mode)
+    - const: change_selection_noyank
+      description: 'Change selection (delete and enter insert mode, without yanking)'
+    - const: increment
+      description: Increment object (number) under cursor
+    - const: decrement
+      description: Decrement object (number) under cursor
+    - const: record_macro
+      description: Start/stop macro recording to the selected register (experimental)
+    - const: replay_macro
+      description: Play back a recorded macro from the selected register (experimental)
+    - const: shell_pipe
+      description: 'Pipe each selection through shell command, replacing with output'
+    - const: shell_pipe_to
+      description: 'Pipe each selection into shell command, ignoring output'
+    - const: shell_insert_output
+      description: 'Run shell command, inserting output before each selection'
+    - const: shell_append_output
+      description: 'Run shell command, appending output after each selection'
+    - const: shell_keep_pipe
+      description: >-
+        Pipe each selection into shell command, keep selections where command
+        returned 0
+    - const: select_regex
+      description: Select all regex matches inside selections
+    - const: split_selection
+      description: Split selection into sub selections on regex matches
+    - const: split_selection_on_newline
+      description: Split selection on newlines
+    - const: merge_selections
+      description: Merge selections
+    - const: merge_consecutive_selections
+      description: Merge consecutive selections
+    - const: align_selections
+      description: Align selection in columns
+    - const: trim_selections
+      description: Trim whitespace from the selection
+    - const: collapse_selection
+      description: Collapse selection onto a single cursor
+    - const: flip_selections
+      description: Flip selection cursor and anchor
+    - const: ensure_selections_forward
+      description: Ensures the selection is in forward direction
+    - const: keep_primary_selection
+      description: Keep only the primary selection
+    - const: remove_primary_selection
+      description: Remove the primary selection
+    - const: copy_selection_on_next_line
+      description: Copy selection onto the next line (Add cursor below)
+    - const: copy_selection_on_prev_line
+      description: Copy selection onto the previous line (Add cursor above)
+    - const: rotate_selections_backward
+      description: Rotate main selection backward
+    - const: rotate_selections_forward
+      description: Rotate main selection forward
+    - const: rotate_selection_contents_backward
+      description: Rotate selection contents backward
+    - const: rotate_selection_contents_forward
+      description: Rotate selection contents forward
+    - const: select_all
+      description: Select entire file
+    - const: extend_line_below
+      description: 'Select current line, if already selected, extend to next line'
+    - const: extend_to_line_bounds
+      description: Extend selection to line bounds (line-wise selection)
+    - const: shrink_to_line_bounds
+      description: Shrink selection to line bounds (line-wise selection)
+    - const: join_selections
+      description: Join lines inside selection
+    - const: join_selections_space
+      description: Join lines inside selection and select the inserted space
+    - const: keep_selections
+      description: Keep selections matching the regex
+    - const: remove_selections
+      description: Remove selections matching the regex
+    - const: toggle_comments
+      description: Comment/uncomment the selections
+    - const: expand_selection
+      description: Expand selection to parent syntax node (TS)
+    - const: shrink_selection
+      description: Shrink syntax tree object selection (TS)
+    - const: select_prev_sibling
+      description: Select previous sibling node in syntax tree (TS)
+    - const: select_next_sibling
+      description: Select next sibling node in syntax tree (TS)
+    - const: search
+      description: Search for regex pattern
+    - const: rsearch
+      description: Search for previous pattern
+    - const: search_next
+      description: Select next search match
+    - const: search_prev
+      description: Select previous search match
+    - const: search_selection
+      description: Use current selection as the search pattern
+    - const: select_mode
+      description: Enter select (extend) mode
+    - const: command_mode
+      description: Enter command mode
+    - const: align_view_center
+      description: Vertically center the line
+    - const: align_view_top
+      description: Align the line to the top of the screen
+    - const: align_view_bottom
+      description: Align the line to the bottom of the screen
+    - const: align_view_middle
+      description: Align the line to the middle of the screen (horizontally)
+    - const: scroll_down
+      description: Scroll the view downwards
+    - const: scroll_up
+      description: Scroll the view upwards
+    - const: page_down
+      description: Move page down
+    - const: page_up
+      description: Move page up
+    - const: page_cursor_half_up
+      description: Move cursor and page half page up
+    - const: page_cursor_half_down
+      description: Move cursor and page half page down
+    - const: goto_file_start
+      description: Go to line number <n> else start of file
+    - const: goto_last_line
+      description: Go to the end of the file
+    - const: goto_file
+      description: Go to files in the selections
+    - const: goto_line_start
+      description: Go to the start of the line
+    - const: goto_line_end
+      description: Go to the end of the line
+    - const: goto_first_nonwhitespace
+      description: Go to first non-whitespace character of the line
+    - const: goto_window_top
+      description: Go to the top of the screen
+    - const: goto_window_center
+      description: Go to the middle of the screen
+    - const: goto_window_bottom
+      description: Go to the bottom of the screen
+    - const: goto_definition
+      description: Go to definition (LSP)
+    - const: goto_type_definition
+      description: Go to type definition (LSP)
+    - const: goto_reference
+      description: Go to references (LSP)
+    - const: goto_implementation
+      description: Go to implementation (LSP)
+    - const: goto_last_accessed_file
+      description: Go to the last accessed/alternate file
+    - const: goto_last_modified_file
+      description: Go to the last modified/alternate file
+    - const: goto_next_buffer
+      description: Go to next buffer
+    - const: goto_previous_buffer
+      description: Go to previous buffer
+    - const: goto_last_modification
+      description: Go to last modification in current file
+    - const: move_line_down
+      description: Move down textual (instead of visual) line
+    - const: move_line_up
+      description: Move up textual (instead of visual) line
+    - const: goto_word
+      description: >-
+        Show labels at each word and select the word that belongs to the entered
+        labels
+    - const: match_brackets
+      description: Goto matching bracket (TS)
+    - const: surround_add
+      description: Surround current selection with <char>
+    - const: surround_replace
+      description: Replace surround character <from> with <to>
+    - const: surround_delete
+      description: Delete surround character <char>
+    - const: select_textobject_around
+      description: Select around textobject
+    - const: select_textobject_inner
+      description: Select inside textobject
+    - const: rotate_view
+      description: Switch to next window
+    - const: vsplit
+      description: Vertical right split
+    - const: hsplit
+      description: Horizontal bottom split
+    - const: goto_file
+      description: Go to files in the selections in horizontal splits
+    - const: goto_file
+      description: Go to files in the selections in vertical splits
+    - const: jump_view_left
+      description: Move to left split
+    - const: jump_view_down
+      description: Move to split below
+    - const: jump_view_up
+      description: Move to split above
+    - const: jump_view_right
+      description: Move to right split
+    - const: wclose
+      description: Close current window
+    - const: wonly
+      description: 'Only keep the current window, closing all the others'
+    - const: swap_view_left
+      description: Swap window to the left
+    - const: swap_view_down
+      description: Swap window downwards
+    - const: swap_view_up
+      description: Swap window upwards
+    - const: swap_view_right
+      description: Swap window to the right
+    - const: file_picker
+      description: Open file picker
+    - const: file_picker_in_current_directory
+      description: Open file picker at current working directory
+    - const: buffer_picker
+      description: Open buffer picker
+    - const: jumplist_picker
+      description: Open jumplist picker
+    - const: changed_file_picker
+      description: Open changed file picker
+    - const: N/A
+      description: Debug (experimental)
+    - const: hover
+      description: Show documentation for item under cursor in a popup (LSP)
+    - const: symbol_picker
+      description: Open document symbol picker (LSP)
+    - const: workspace_symbol_picker
+      description: Open workspace symbol picker (LSP)
+    - const: diagnostics_picker
+      description: Open document diagnostics picker (LSP)
+    - const: workspace_diagnostics_picker
+      description: Open workspace diagnostics picker (LSP)
+    - const: rename_symbol
+      description: Rename symbol (LSP)
+    - const: code_action
+      description: Apply code action (LSP)
+    - const: select_references_to_symbol_under_cursor
+      description: Select symbol references (LSP)
+    - const: last_picker
+      description: Open last fuzzy picker
+    - const: N/A
+      description: Enter window mode
+    - const: toggle_comments
+      description: Comment/uncomment selections
+    - const: toggle_block_comments
+      description: Block comment/uncomment selections
+    - const: toggle_line_comments
+      description: Line comment/uncomment selections
+    - const: paste_clipboard_after
+      description: Paste system clipboard after selections
+    - const: paste_clipboard_before
+      description: Paste system clipboard before selections
+    - const: yank_to_clipboard
+      description: Yank selections to clipboard
+    - const: yank_main_selection_to_clipboard
+      description: Yank main selection to clipboard
+    - const: replace_selections_with_clipboard
+      description: Replace selections by clipboard contents
+    - const: global_search
+      description: Global search in workspace folder
+    - const: command_palette
+      description: Open command palette
+    - const: goto_next_diag
+      description: Go to next diagnostic (LSP)
+    - const: goto_prev_diag
+      description: Go to previous diagnostic (LSP)
+    - const: goto_last_diag
+      description: Go to last diagnostic in document (LSP)
+    - const: goto_first_diag
+      description: Go to first diagnostic in document (LSP)
+    - const: goto_next_function
+      description: Go to next function (TS)
+    - const: goto_prev_function
+      description: Go to previous function (TS)
+    - const: goto_next_class
+      description: Go to next type definition (TS)
+    - const: goto_prev_class
+      description: Go to previous type definition (TS)
+    - const: goto_next_parameter
+      description: Go to next argument/parameter (TS)
+    - const: goto_prev_parameter
+      description: Go to previous argument/parameter (TS)
+    - const: goto_next_comment
+      description: Go to next comment (TS)
+    - const: goto_prev_comment
+      description: Go to previous comment (TS)
+    - const: goto_next_test
+      description: Go to next test (TS)
+    - const: goto_prev_test
+      description: Go to previous test (TS)
+    - const: goto_next_paragraph
+      description: Go to next paragraph
+    - const: goto_prev_paragraph
+      description: Go to previous paragraph
+    - const: goto_next_change
+      description: Go to next change
+    - const: goto_prev_change
+      description: Go to previous change
+    - const: goto_last_change
+      description: Go to last change
+    - const: goto_first_change
+      description: Go to first change
+    - const: add_newline_below
+      description: Add newline below
+    - const: add_newline_above
+      description: Add newline above
+    - const: normal_mode
+      description: Switch to normal mode
+    - const: commit_undo_checkpoint
+      description: Commit undo checkpoint
+    - const: completion
+      description: Autocomplete
+    - const: insert_register
+      description: Insert a register content
+    - const: delete_word_backward
+      description: Delete previous word
+    - const: delete_word_forward
+      description: Delete next word
+    - const: kill_to_line_start
+      description: Delete to start of line
+    - const: kill_to_line_end
+      description: Delete to end of line
+    - const: delete_char_backward
+      description: Delete previous char
+    - const: delete_char_forward
+      description: Delete next char
+    - const: insert_newline
+      description: Insert new line
+    - const: move_line_up
+      description: Move to previous line
+    - const: move_line_down
+      description: Move to next line
+    - const: move_char_left
+      description: Backward a char
+    - const: move_char_right
+      description: Forward a char
+    - const: page_up
+      description: Move one page up
+    - const: page_down
+      description: Move one page down
+    - const: goto_line_start
+      description: Move to line start
+    - const: goto_line_end_newline
+      description: Move to line end
+    type: string
+  LSP:
+    additionalProperties: false
+    properties:
+      auto-signature-help:
+        default: true
+        description: Enable automatic popup of signature help (parameter hints)
+        type: boolean
+      display-inlay-hints:
+        default: false
+        description: >-
+          Display inlay hints.
+
+          You may also have to activate them in the LSP config for them
+          to appear, not just in Helix. Inlay hints in Helix are still
+          being improved on and may be a little bit laggy/janky under some
+          circumstances. Please report any bugs you see so we can fix them!
+        type: boolean
+      display-messages:
+        default: false
+        description: >-
+          Display LSP progress messages below statusline.
+
+          By default, a progress spinner is shown in the statusline beside the
+          file path.
+        type: boolean
+      display-signature-help-docs:
+        default: true
+        description: Display docs under signature help popup
+        type: boolean
+      enable:
+        default: true
+        description: >-
+          Enables LSP integration. Setting to false will completely disable
+          language servers regardless of language settings.
+        type: boolean
+      goto-reference-include-declaration:
+        default: true
+        description: Include declaration in the goto references popup.
+        type: boolean
+      snippets:
+        default: true
+        description: >-
+          Enables snippet completions. Requires a server restart (:lsp-restart)
+          to take effect after :config-reload/:set.
+        type: boolean
+    type: object
+  Mode:
+    additionalProperties: false
+    description: Mode customisations
+    properties: 
+      insert:
+        default: INS
+        description: The text shown in the mode element for insert mode
+        type: string
+      normal:
+        default: NOR
+        description: The text shown in the mode element for normal mode
+        type: string
+      select:
+        default: SEL
+        description: The text shown in the mode element for select mode
+        type: string
+    type: object
+  Search:
+    additionalProperties: false
+    description: Search specific options.
+    properties: 
+      smart-case:
+        default: true
+        description: >-
+          Enable smart case regex searching (case-insensitive unless pattern
+          contains upper case characters)
+        type: boolean
+      wrap-around:
+        default: true
+        description: Whether the search should wrap after depleting the matches
+        type: boolean
+    type: object
+  SmartTab:
+    additionalProperties: false
+    description: |-
+      Options for navigating and editing using tab key.
+
+      Due to lack of support for S-tab in some terminals, the default
+      keybindings don't fully embrace smart-tab editing experience. If you enjoy
+      smart-tab navigation and a terminal that supports the Enhanced Keyboard
+      protocol, consider setting extra keybindings:
+
+      ```toml
+      [keys.normal]
+      tab = "move_parent_node_end"
+      S-tab = "move_parent_node_start"
+
+      [keys.insert]
+      S-tab = "move_parent_node_start"
+
+      [keys.select]
+      tab = "extend_parent_node_end"
+      S-tab = "extend_parent_node_start"
+      ```
+    properties: 
+      enable:
+        default: true
+        description: >-
+          If set to true, then when the cursor is in a position with
+          non-whitespace to its left, instead of inserting a tab, it will run
+          move_parent_node_end. If there is only whitespace to the left, then
+          it inserts a tab as normal. With the default bindings, to explicitly
+          insert a tab character, press Shift-tab.
+        type: boolean
+      supersede-menu:
+        default: false
+        description: >-
+          Normally, when a menu is on screen, such as when auto complete is
+          triggered, the tab key is bound to cycling through the items. This
+          means when menus are on screen, one cannot use the tab key to trigger
+          the smart-tab command. If this option is set to true, the smart-tab
+          command always takes precedence, which means one cannot use the tab
+          key to cycle through menu items. One of the other bindings must be
+          used instead, such as arrow keys or C-n/C-p.
+        type: boolean
+    type: object
+  SoftWrap:
+    additionalProperties: false
+    properties:
+      enable:
+        default: false
+        description: Whether soft wrapping is enabled.
+        type: boolean
+      max-indent-retain:
+        default: 40
+        description: >-
+          Maximum indentation to carry over when soft wrapping a line.
+        type: integer
+      max-wrap:
+        default: 20
+        description: Maximum free space left at the end of the line.
+        type: integer
+      wrap-at-text-width:
+        default: false
+        description: >-
+          Soft wrap at text-width instead of using the full viewport size.
+        type: boolean
+      wrap-indicator:
+        default: "↪"
+        description: >-
+          Text inserted before soft wrapped lines, highlighted with
+          ui.virtual.wrap
+        type: string
+    type: object
+  StatusLineElements:
+    items:
+      anyOf:
+      - const: mode
+        description: >-
+          The current editor mode (mode.normal/mode.insert/mode.select)
+      - const: spinner
+        description: A progress spinner indicating LSP activity
+      - const: file-name
+        description: The path/name of the opened file
+      - const: file-absolute-path
+        description: The absolute path/name of the opened file
+      - const: file-base-name
+        description: The basename of the opened file
+      - const: file-modification-indicator
+        description: >-
+          The indicator to show whether the file is modified (a [+] appears when
+          there are unsaved changes)
+      - const: file-encoding
+        description: The encoding of the opened file if it differs from UTF-8
+      - const: file-line-ending
+        description: The file line endings (CRLF or LF)
+      - const: read-only-indicator
+        description: >-
+          An indicator that shows [readonly] when a file cannot be written
+      - const: total-line-numbers
+        description: The total line numbers of the opened file
+      - const: file-type
+        description: The type of the opened file
+      - const: diagnostics
+        description: The number of warnings and/or errors
+      - const: workspace-diagnostics
+        description: The number of warnings and/or errors on workspace
+      - const: selections
+        description: The number of active selections
+      - const: primary-selection-length
+        description: The number of characters currently in primary selection
+      - const: position
+        description: The cursor position
+      - const: position-percentage
+        description: >-
+          The cursor position as a percentage of the total number of lines
+      - const: separator
+        description: >-
+          The string defined in editor.statusline.separator (defaults to "│")
+      - const: spacer
+        description: >-
+          Inserts a space between elements (multiple/contiguous spacers may
+          be specified)
+      - const: version-control
+        description: >-
+          The current branch name or detached commit hash of the opened
+          workspace
+      - const: register
+        description: The current selected register
+    type: array
+  Theme:
+    description: 'Name of the theme to use. https://docs.helix-editor.com/master/themes.html'
+    oneOf:
+    - enum:
+      - acme
+      - darcula
+      type: string
+    - type: string
+    title: Color theme
+  Whitespace:
+    additionalProperties: false
+    description: >-
+      Options for rendering whitespace with visible characters. Use :set
+      whitespace.render all to temporarily enable visible whitespace.
+    properties:
+      render:
+        description: >-
+          Whether to render whitespace. May either be all or none, or a table.
+        oneOf:
+        - $ref: '#/definitions/Render'
+        - $ref: '#/definitions/RenderTable'
+      characters:
+        $ref: '#/definitions/WhitespaceCharacters'
+        description: Literal characters to use when rendering whitespace.
+    type: object
+  WhitespaceCharacters:
+    properties:
+      nbsp:
+        pattern: '^.$'
+        type: string
+      newline:
+        pattern: '^.$'
+        type: string
+      nnbsp:
+        pattern: '^.$'
+        type: string
+      space:
+        pattern: '^.$'
+        type: string
+      tab:
+        pattern: '^.$'
+        type: string
+      tabpad:
+        pattern: '^.$'
+        type: string
+    type: object
+  Render:
+    description: Whether to render a character.
+    enum:
+    - all
+    - none
+    type: string
+  RenderTable:
+    additionalProperties: false
+    properties:
+      nbsp:
+        $ref: '#/definitions/Render'
+      newline:
+        $ref: '#/definitions/Render'
+      nnbsp:
+        $ref: '#/definitions/Render'
+      space:
+        $ref: '#/definitions/Render'
+      tab:
+        $ref: '#/definitions/Render'
+    type: object
+description: global configuration parameters
+title: Helix Editor
+properties:
+  editor:
+    $ref: '#/definitions/Editor'
+  keys:
+    $ref: '#/definitions/Keys'
+  theme:
+    $ref: '#/definitions/Theme'
+type: object
