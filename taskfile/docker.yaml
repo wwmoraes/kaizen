@@ -23,7 +23,7 @@ tasks:
     - sh: >-
         docker builder inspect --debug
         | xargs
-        | rg --fixed-strings -- "Multi-platform build: true" > /dev/null
+        | rg 'Multi-platform build:\s*true' > /dev/null
       msg: Please create and enable a docker builder that supports multi-platform builds.
     env:
       DOCKER_BUILDKIT: 1
@@ -45,6 +45,8 @@ tasks:
       {{ with (. | trim) -}}
       --platform {{ . | splitList " " | compact | join "," }}
       {{ end -}}
+      {{ else -}}
+      --load
       {{ end -}}
       --file {{ .DOCKERFILE | q }}
       {{ with .BUILD_ARGS -}}
@@ -134,7 +136,9 @@ tasks:
     - sh: command -v docker &> /dev/null
       msg: Binary 'docker' not found.
     deps:
-    - build
+    - task: build
+      vars:
+        PLATFORMS: '{{ .PLATFORMS }}'
     cmd: >-
       docker run --rm -it {{ .DOCKER_RUN_CLI_ARGS }}
       {{ .NAME }}:{{ .TAG }} {{ .CLI_ARGS }}
