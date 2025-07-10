@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+includes:
+  git:
+    taskfile: taskfile/git.yaml
+  docker:
+    taskfile: taskfile/docker.yaml
+    vars:
+      NAME: kaizen
+      TAGS: latest
+      PLATFORMS: >-
+        linux/amd64
+        linux/arm/v7
+        linux/arm64
+
+tasks:
+  debug:
+    cmd: |-
+      echo "revision: {{ .REVISION }}"

@@ -41,12 +41,12 @@ tasks:
         {{ .LABELS }}
     cmd: >-
       docker buildx build
+      {{ if not (contains "--load" .CLI_ARGS) -}}
       {{ with .PLATFORMS -}}
       {{ with (. | trim) -}}
       --platform {{ . | splitList " " | compact | join "," }}
       {{ end -}}
-      {{ else -}}
-      --load
+      {{ end -}}
       {{ end -}}
       --file {{ .DOCKERFILE | q }}
       {{ with .BUILD_ARGS -}}
@@ -54,11 +54,15 @@ tasks:
       --build-arg {{ $value }}
       {{ end -}}
       {{ end -}}
-      {{ range $value := (.LABELS | trim | splitList " " | compact) -}}
+      {{ with .LABELS -}}
+      {{ range $value := (. | trim | splitList " " | compact) -}}
       --label {{ $value }}
       {{ end -}}
-      {{ range $value := (.TAGS | trim | splitList " " | compact) -}}
+      {{ end -}}
+      {{- with .TAGS }}
+      {{ range $value := (. | trim | splitList " " | compact) -}}
       --tag {{ $.NAME }}:{{ $value }}
+      {{ end -}}
       {{ end -}}
       {{ .CLI_ARGS }}
       {{ .CONTEXT | q }}
